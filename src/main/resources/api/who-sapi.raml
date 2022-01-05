@@ -1,0 +1,56 @@
+#%RAML 1.0
+title: who-sapi
+version: v1
+baseUri: http://{environment}/covid/{version}/
+baseUriParameters:
+  environment:
+    description: dev,test
+    enum: ["who-ntpl-dev-aws-sapi.us-e2.cloudhub.io","who-ntpl-test-aws-sapi.us-e2.cloudhub.io"]
+traits:
+  client-id-header: !include exchange_modules/286e56fb-8f93-4454-83f5-6ef1e2a38ce1/client-id-required/1.0.0/client-id-required.raml
+  transaction-id-header: !include exchange_modules/286e56fb-8f93-4454-83f5-6ef1e2a38ce1/correlation-id-header/1.0.0/correlation-id-header.raml
+  correlation-id-header: !include exchange_modules/286e56fb-8f93-4454-83f5-6ef1e2a38ce1/correlation-id-header/1.0.0/correlation-id-header.raml
+
+uses:
+  common-error-types: exchange_modules/286e56fb-8f93-4454-83f5-6ef1e2a38ce1/common-data-types/1.0.0/common-data-types.raml
+  common-resource-types: exchange_modules/286e56fb-8f93-4454-83f5-6ef1e2a38ce1/resource-types/1.0.0/resource-types.raml
+  who-sapi-types: who-sapi-types/who-sapi-types.raml
+/case:
+  post:
+    is: [client-id-header, transaction-id-header, correlation-id-header]
+    body:
+      application/json:
+        type: who-sapi-types.report-covid-case-request-type
+        example: !include who-examples/report-covid-case-request.json
+    responses:
+      200:
+        body:
+          application/json:
+            type: who-sapi-types.report-covid-case-response-type
+            example: !include who-examples/report-covid-case-response.json
+      400:
+        body:
+          application/json:
+            type: common-error-types.errorType
+            example: !include who-examples/400.json
+      500:
+        body:
+          application/json:
+            type: common-error-types.errorType
+            example: !include who-examples/500.json
+      503:
+        body:
+          application/json:
+            type: common-error-types.errorType
+            example: !include who-examples/503.json
+/health-check:
+  get:
+  type:
+    common-resource-types.all:
+      getResponseType: string
+    
+          
+
+        
+
+    

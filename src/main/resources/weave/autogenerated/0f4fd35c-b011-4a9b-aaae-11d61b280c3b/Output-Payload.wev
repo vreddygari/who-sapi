@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_0f4fd35c_b011_4a9b_aaae_11d61b280c3b_Output_Payload = {|
+  COVID_CASE: {|
+    FIRST_NAME: String, 
+    LAST_NAME: String, 
+    PHONE: String, 
+    EMAIL: String | Null, 
+    DATE_OF_BIRTH: String, 
+    COUNTRY: String
+  |}
+|}
+

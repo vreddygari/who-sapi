@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_0f4fd35c_b011_4a9b_aaae_11d61b280c3b_Output_Variables_dynamicProperties = {| CASE_TYPE: String |}
+

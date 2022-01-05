@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	 <flow name="get:\health-check:who-sapi-config">
+        <logger level="INFO" message="get:\health-check:who-sapi-config" />
+		<ee:transform doc:name="Transform Message" doc:id="e3a4135a-8741-4010-ab66-7e01dee03857" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:app.name ++ " is live and kicking"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    
+</flow>
+    
+	
+	</mule>

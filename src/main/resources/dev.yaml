@@ -1,0 +1,9 @@
+jms:
+ username: "admin"
+ password: "![z731MxIuIDY=]"
+ brokerurl: "tcp://localhost:61616"
+ queue: "Q.WHO.COVID.CASE.REPORT"
+ 
+http:
+ port: "8084"
+ 

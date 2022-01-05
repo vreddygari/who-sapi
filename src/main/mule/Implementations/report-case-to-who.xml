@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="post:\case:application\json:who-sapi-config">
+        <set-variable value="#[attributes.headers.'x-correlation-id' default&quot;&quot;]" doc:name="Set correlationId" doc:id="10b6bb0e-99c9-42ca-8fd1-19a687d3f111" variableName="correlationId"/>
+		<logger level="INFO" doc:name="Start Log" doc:id="87d68595-af67-4d9a-8b17-19350e9b4ac0" message="transactionId: #[vars.transactionId],correlationId:#[vars.correlationId], message: Started report covid case to who flow ,payload: #[payload]"/>
+		<ee:transform doc:name="Transform WHO Case Payload" doc:id="4b242835-b4d9-4737-a176-bd8f7b50a373" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	COVID_CASE:
+	{
+		FIRST_NAME:payload.firstName,
+		LAST_NAME:payload.lastName,
+		PHONE:payload.phone,
+		EMAIL:payload.email,
+		DATE_OF_BIRTH:payload.dateOfBirth,
+		COUNTRY:payload.country
+	}
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="dynamicProperties" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	CASE_TYPE:payload.caseType
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="4fafc7d9-c74e-4d95-bd59-7277e908f6fc" name="publish-covid-case-to-who"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Prepare Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  code: 200,
+  message: "Success",
+  description: "Case reported successfully",
+  dateTime: now() as String{format:"yyyy-MM-dd'T'HH:mm:ss'Z'"},
+  transactionId: vars.transactionId
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<logger level="INFO" doc:name="End Logger" doc:id="a4e7b334-749b-42c8-be19-056d584cfff6" message='transactionId: #[vars.transactionId]], correlationId: #[vars.correlationId], message: "Ended report covid case to who flow", payload: #[payload]'/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0871ff06-20bf-4bdc-acfc-0fab12b07c5e" type="ANY">
+				<set-variable value="#[500]" doc:name="Set http Status 500" doc:id="7adac3bd-2122-488d-8df7-3d41ff2d5f3a" variableName="httpStatus"/>
+				<set-variable value="#[error.description]" doc:name="Set errorDescription" doc:id="c4dd36ff-2f18-4e14-b34c-239ba66d8864" variableName="errorDescription"/>
+				<set-variable value='#["Internal Server Error"]' doc:name="Set errorMessage" doc:id="fd58b9e3-826a-41da-a299-d55198263713" variableName="errorMessage"/>
+				<flow-ref doc:name="global-prepare-error-response-sub-flow" doc:id="afef9a30-e79f-4195-8feb-ec6eb9b1d4e4" name="global-prepare-error-response-sub-flow"/>
+			</on-error-continue>
+		</error-handler>
+    
+</flow>
+	</mule>
